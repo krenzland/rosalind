@@ -1,3 +1,9 @@
+// Given: At most 10 DNA strings in FASTA format (of length at most 1 kbp each).
+
+// Return: The ID of the string having the highest GC-content, followed by the GC-content of that string.
+// Rosalind allows for a default error of 0.001 in all decimal answers
+// unless otherwise stated; please see the note on absolute error below.
+
 #![feature(io)]
 #![feature(path)]
 #![feature(core)]
@@ -35,11 +41,33 @@ fn main () {
 
 	let input: &str = content.as_slice();
 
-	let fastas = parse_fasta(input);
+	let dnas = parse_fasta(input);
 
-	for fasta in fastas {
-		println!("{:?}", fasta);
+	let mut max_name = "".to_string();
+	let mut max_gc_content = 0.0;
+
+	for dna in dnas {
+		let gc_content = get_gc_content(&dna);
+		if (max_gc_content <= gc_content) {
+			max_name = dna.label;
+			max_gc_content = gc_content;
+		}
 	}
+
+	println!("{}\n{}", max_name, max_gc_content);
+
+}
+
+fn get_gc_content(dna: &Fasta) -> f64 {
+	let mut counter = 0;
+	let size = dna.content.len();
+
+	for c in dna.content.graphemes(true) {
+		if c == "C" || c == "G" {
+			counter += 1;
+		}
+	}
+	(100 * counter) as f64/size as f64
 }
 
 fn parse_fasta(input: &str) -> Vec<Fasta> {
@@ -57,9 +85,11 @@ fn parse_fasta(input: &str) -> Vec<Fasta> {
 	result
 }
 
+
 fn vec_to_fasta(vec: Vec<&str>) -> Fasta {
 	let label = vec[0].to_string();
 	let content = vec[1].replace("\n","");
 	Fasta {label: label, 
 			content: content}
 	}
+
