@@ -1,0 +1,8 @@
+[package]
+
+name = "DNA"
+version = "0.0.1"
+authors = ["Lukas Krenz <lukas@krenz.land>"]
+
+[[bin]]
+name = "DNA"
